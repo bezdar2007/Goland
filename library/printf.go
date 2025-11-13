@@ -4,35 +4,25 @@ import "fmt"
 
 func main() {
 
-    //типы данных
-    var a int8 = -1
-    var b uint8 = 2
-    var c byte = 3
-    var d rune = -7
-    var f uint32 = 8
-    var g uint64 = 10
-    var h int = 192
-    var j uint = 105
+	var a int = 100
+	//Форматированный вывод (Форматированная строка, последующее значение подставляемое в формат (
+	//%d - десятичных чисел)
+	//%v - вещественных чисел
+	//%s - строки
+	//%g -
+	//%T - герб - тип значения)
+	fmt.Printf("a = %d, тип переменной: (type: %T)\n", a, a)
 
-    fmt.Println("a: ", a)
-    fmt.Println("b: ", b)
-    fmt.Println("c: ", c)
-    fmt.Println("d: ", d)
-    fmt.Println("f: ", f)
-    fmt.Println("g: ", g)
-    fmt.Println("h: ", h)
-    fmt.Println("j: ", j)
+	b := 3.14
+	fmt.Printf("b = %v, тип переменной: (type: %T)\n", b, b)
 
-var f float32 = 19
-var g float32 = 4.6
-var d float64 = 0.3232
+	var x string = "Текст"
+	fmt.Printf("x = %s, тип переменной: (type: %T)\n", x, x)
 
-fmt.Println("f: ", f)
-fmt.Println("g: ", g)
-fmt.Println("d: ", d)
+	//Объявление нескольких переменных
+	var num1, stroka = 1, "какой то текст"
+	fmt.Printf("num1 = %d, stroka = %s", num1, stroka)
 
-var compl complex64 = 1+2i
-var compl1 complex128 = 4+3i
-
-fmt.Print(compl, compl1)
+	const pi float64 = 3.1415
+	fmt.Println("Число Pi равно", pi)
 }
