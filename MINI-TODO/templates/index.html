@@ -2,21 +2,117 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mini TODO</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        ul { list-style: none; padding: 0; }
+        li { padding: 10px; margin: 5px 0; background: #f5f5f5; border-radius: 5px; display: flex; justify-content: space-between; }
+        form { margin-top: 20px; display: flex; gap: 10px; }
+        input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .delete-btn { background: #dc3545; padding: 5px 10px; font-size: 12px; }
+        .delete-btn:hover { background: #c82333; }
+        .task-title { flex: 1; }
+    </style>
 </head>
 <body>
 <h1>Список задач</h1>
-<ul>
+<ul id="taskList">
     {{range .Tasks}}
-    <li>{{.ID}}. {{.Title}}</li>
+    <li id="task-{{.ID}}">
+        <span class="task-title">{{.ID}}. {{.Title}}</span>
+        <button class="delete-btn" onclick="deleteTask({{.ID}})">Удалить</button>
+    </li>
     {{else}}
     <li><em>Задачи отсутствуют</em></li>
     {{end}}
 </ul>
+
 <h2>Добавить новую задачу</h2>
-<form action="/todo-add" method="POST">
-    <input name="title" placeholder="Название задачи">
+<form id="addForm" action="/todo-add" method="POST">
+    <input name="title" placeholder="Название задачи" required>
     <button type="submit">Добавить</button>
 </form>
+
+<script>
+    // AJAX для удаления задач
+    async function deleteTask(id) {
+        if (!confirm('Удалить задачу?')) return;
+
+        try {
+            const response = await fetch(`/api/todos/delete?id=${id}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                const taskElement = document.getElementById(`task-${id}`);
+                if (taskElement) taskElement.remove();
+
+                // Если список пуст, покажем сообщение
+                const taskList = document.getElementById('taskList');
+                if (taskList.children.length === 0) {
+                    taskList.innerHTML = '<li><em>Задачи отсутствуют</em></li>';
+                }
+            } else {
+                alert('Ошибка удаления задачи');
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+            alert('Ошибка соединения с сервером');
+        }
+    }
+
+    // AJAX для добавления задач (опционально)
+    document.getElementById('addForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        const title = formData.get('title');
+
+        if (!title.trim()) return;
+
+        try {
+            // Отправляем AJAX запрос
+            const response = await fetch('/api/todos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ title: title })
+            });
+
+            if (response.ok) {
+                const newTask = await response.json();
+
+                // Добавляем задачу в список
+                const taskList = document.getElementById('taskList');
+
+                // Если было сообщение "задачи отсутствуют", удаляем его
+                if (taskList.innerHTML.includes('Задачи отсутствуют')) {
+                    taskList.innerHTML = '';
+                }
+
+                const li = document.createElement('li');
+                li.id = `task-${newTask.ID}`;
+                li.innerHTML = `
+                <span class="task-title">${newTask.ID}. ${newTask.Title}</span>
+                <button class="delete-btn" onclick="deleteTask(${newTask.ID})">Удалить</button>
+            `;
+                taskList.appendChild(li);
+
+                // Очищаем поле ввода
+                this.reset();
+            } else {
+                // Если AJAX не сработал, отправляем форму обычным способом
+                this.submit();
+            }
+        } catch (error) {
+            // Если ошибка, отправляем форму обычным способом
+            this.submit();
+        }
+    });
+</script>
 </body>
 </html>

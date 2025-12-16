@@ -25,6 +25,7 @@ func DeleteTask(id int) bool {
 	for i, t := range tasks {
 		if t.ID == id {
 			tasks = append(tasks[:i], tasks[i+1:]...)
+			fmt.Printf("Удалена задача с ID: %d\n", id)
 			return true
 		}
 	}
