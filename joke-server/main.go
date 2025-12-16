@@ -17,4 +17,13 @@ func main() {
 	if err != nil {
 		fmt.Println("Ошибка запуска сервера:", err)
 	}
+
+	func homeHandler(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Добро пожаловать на главную страницу!")
+	}
+
+	func aboutHandler(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Это страница 'О нас'.")
+	}
+
 }
